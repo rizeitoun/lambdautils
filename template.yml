@@ -1,10 +1,19 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: Template of AutoBranching Lambda Function
+Parameters:
+  LambdaFunctionParameter:
+    Type: String
+    Default: git_branching.lambda_handler
+    AllowedValues:
+      - git_branching.lambda_handler
+      - git_statuses.lambda_handler
+    Description: Lambda Function to run.
 Resources:
   BranchFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: lambda_function.lambda_handler
+      Handler:
+        Ref: LambdaFunctionParameter
       Runtime: python3.7
       CodeUri: ./
