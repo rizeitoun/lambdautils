@@ -12,8 +12,9 @@ phases:
       - echo Build started on `date`
       - pip install requests -t ./
       - zip -r ../LambdaDeployment.zip .
+      - mv ../LambdaDeployment.zip .
 
 artifacts:
   files:
-    - appspec.yml
+    - appspec.yaml
     - LambdaDeployment.zip
