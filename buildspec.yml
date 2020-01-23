@@ -4,10 +4,14 @@ phases:
   install:
     runtime-versions:
       python: 3.7
+  pre_build:
+    commands:
+      - echo No prebuild
   build:
-    - echo Build started on `date`
-    - pip install requests -t ./
-    - zip -r ../LambdaDeployment.zip .
+    commands:
+      - echo Build started on `date`
+      - pip install requests -t ./
+      - zip -r ../LambdaDeployment.zip .
 
 artifacts:
   files:
