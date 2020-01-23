@@ -17,3 +17,11 @@ Resources:
         Ref: LambdaFunctionParameter
       Runtime: python3.7
       CodeUri: ./
+      Role: >-
+        arn:aws:iam::359042822489:role/service-role/gitBranchChange-role-feip54yw
+      Events:
+        Api1:
+          Type: Api
+          Properties:
+            Path: /git
+            Method: ANY
