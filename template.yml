@@ -10,6 +10,10 @@ Parameters:
       - git_statuses.lambda_handler
     Description: Lambda Function to run.
 Resources:
+  GitPostEvent:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: test
   BranchFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -20,13 +24,12 @@ Resources:
       Role: >-
         arn:aws:iam::359042822489:role/service-role/gitBranchChange-role-feip54yw
       Events:
-        GetResource:
-          Type: Api
-          Description: Lambda Function to run.
-          Properties:
-            RestApiId: !Ref MyApi
-            Path: https://4g1wjyrkwk.execute-api.us-east-1.amazonaws.com/test/git
-            Method: ANY
+          GetResource:
+            Type: Api
+            Properties:
+              RestApiId: !Ref GitPostEvent
+              Path: /git
+              Method: ALL
       Environment:
         Variables:
           oauth: >-
