@@ -1,0 +1,15 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      python: 3.7
+  build:
+    - echo Build started on `date`
+    - pip install requests -t ./
+    - zip -r ../LambdaDeployment.zip .
+
+artifacts:
+  files:
+    - appspec.yml
+    - ../LambdaDeployment.zip
