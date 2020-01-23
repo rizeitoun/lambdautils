@@ -20,10 +20,12 @@ Resources:
       Role: >-
         arn:aws:iam::359042822489:role/service-role/gitBranchChange-role-feip54yw
       Events:
-        Api1:
+        GetResource:
           Type: Api
+          Description: Lambda Function to run.
           Properties:
-            Path: /git
+            RestApiId: !Ref MyApi
+            Path: https://4g1wjyrkwk.execute-api.us-east-1.amazonaws.com/test/git
             Method: ANY
       Environment:
         Variables:
