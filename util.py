@@ -7,7 +7,7 @@ from base64 import b64decode
 from typing import Dict
 
 
-def decrypt_env_variable(name: str, region: str ='us-east-1') -> str:
+def decrypt_env_variable(name: str, region: str = 'us-east-1') -> str:
     """
     AWS Key Management to decode a key saved as an environmental variable.
     Ensure KMS used has authorized IAM on Lambda function.
