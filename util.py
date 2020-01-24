@@ -23,7 +23,7 @@ def dictionary_encode(dictionary_in: Dict) -> str:
     return json.dumps(dictionary_in, separators=(',', ':'))
 
 
-def validate_hash(payload : str, secret : str, expected, encoding_scheme: str = 'ascii', algorithm=hashlib.sha1) -> bool:
+def validate_hash(payload: str, secret: str, expected, encoding_scheme: str = 'ascii', algorithm=hashlib.sha1) -> bool:
     """
     Validates hash using hmac.
     """

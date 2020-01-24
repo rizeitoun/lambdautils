@@ -88,8 +88,3 @@ def lambda_handler(event, _):
             ecr_client.delete_repository(repositoryName=pipeline_name)
 
     return util.status_output(200, "POST successfully processed")
-
-
-if __name__ == '__main__':
-    pipeline_name = 'abc'
-    print(json.dumps([{'name':'CONTAINER_NAME','value':pipeline_name,'type':'PLAINTEXT'}], separators=(',', ':')))
