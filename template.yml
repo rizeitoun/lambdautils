@@ -19,7 +19,6 @@ Resources:
     Properties:
       Name:
         Fn::Sub: todo-app-api-${StageName}
-      Description: API monitoring git creating/deleting branches.
       StageName:
         Ref: StageName
       EndpointConfiguration: REGIONAL
