@@ -36,3 +36,7 @@ Resources:
             AQICAHiGwA1MaRcBVUzLJnkgfCGNqmYiGUA1FHzkR0Dpvb5WUAFXdYE3/lyST/zqUweqmrR1AAAAhzCBhAYJKoZIhvcNAQcGoHcwdQIBADBwBgkqhkiG9w0BBwEwHgYJYIZIAWUDBAEuMBEEDF/DngKpPgtu/+rapAIBEIBDkY7BbWUQKlGKoMuUS5WJBs5qd5oyC64UWTX+93QmXNkc/fzlI8j7FG6yXiKT+gc38gaZthQlgg0N+SDK34TBKQiV0g==
           secret: >-
             AQICAHiGwA1MaRcBVUzLJnkgfCGNqmYiGUA1FHzkR0Dpvb5WUAEMW8AZPb5jxrD4nhxrMsVrAAAAZDBiBgkqhkiG9w0BBwagVTBTAgEAME4GCSqGSIb3DQEHATAeBglghkgBZQMEAS4wEQQMPtD6uQuhJp21cJbLAgEQgCExQL4D6eZmbBWFUXbEfcCx6rDg5JpM5bMF/v1vleXew8Y=
+Outputs:
+  GitPostEvent:
+    Description: 'API Gateway endpoint URL'
+    Value: !Sub 'https://${GitPostEvent}.execute-api.${AWS::Region}.amazonaws.com/test/git'
