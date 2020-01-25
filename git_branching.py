@@ -31,7 +31,7 @@ def validate_hash(body, access):
 def delete_pipeline_ecr(ecr_client: boto3.client, pipe_client: boto3.client, name: str):
     try:
         pipe_client.delete_pipeline(name=name)
-        ecr_client.delete_repository(repositoryName=name)
+        ecr_client.delete_repository(repositoryName=name, force=True)
     except (ecr_client.exceptions.RepositoryNotFoundException,
             pipe_client.exceptions.PipelineNotFoundException):
         pass
