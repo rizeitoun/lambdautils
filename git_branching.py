@@ -23,7 +23,8 @@ def validate_hash(body, access):
 
     return_data = None
     if not validate:
-        return_data = util.status_output(403, "Unable to validate input.")
+        #return_data = util.status_output(403, "Unable to validate input.")
+        return_data = util.status_output(403, encoded_body[0:100])
 
     return return_data
 
