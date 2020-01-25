@@ -23,11 +23,18 @@ def validate_hash(body, access):
 
     return_data = None
     if not validate:
-        #return_data = util.status_output(403, "Unable to validate input.")
-        return_data = util.status_output(403, encoded_body[0:100])
+        return_data = util.status_output(403, "Unable to validate input.")
 
     return return_data
 
+
+def delete_pipeline_ecr(ecr_client: boto3.client, pipe_client: boto3.client, name: str):
+    try:
+        pipe_client.delete_pipeline(name=name)
+        ecr_client.delete_repository(repositoryName=name)
+    except (ecr_client.exceptions.RepositoryNotFoundException,
+            pipe_client.exceptions.PipelineNotFoundException):
+        pass
 
 def lambda_handler(event, _):
 
@@ -55,7 +62,7 @@ def lambda_handler(event, _):
 
     if body['ref_type'] == 'branch':
         ecr_client = boto3.client('ecr')
-        client = boto3.client('codepipeline')
+        pipe_client = boto3.client('codepipeline')
 
         ref = body['ref']
         project_name = body['repository']['name']
@@ -82,12 +89,16 @@ def lambda_handler(event, _):
 
             ecr_tags = get_tags('Key', 'Value')
             pipeline_tags = get_tags('key', 'value')
-            ecr_client.create_repository(repositoryName=pipeline_name, tags=ecr_tags)
-            ecr_client.put_lifecycle_policy(repositoryName=pipeline_name, lifecyclePolicyText=policy_json)
-            client.create_pipeline(pipeline=template_json['pipeline'], tags=pipeline_tags)
+
+            try:
+                ecr_client.create_repository(repositoryName=pipeline_name, tags=ecr_tags)
+                ecr_client.put_lifecycle_policy(repositoryName=pipeline_name, lifecyclePolicyText=policy_json)
+                pipe_client.create_pipeline(pipeline=template_json['pipeline'], tags=pipeline_tags)
+            except (ecr_client.exceptions.RepositoryAlreadyExistsException,
+                    pipe_client.exceptions.PipelineNameInUseException):
+                pass
 
         elif event_type == 'delete':
-            client.delete_pipeline(name=pipeline_name)
-            ecr_client.delete_repository(repositoryName=pipeline_name)
+            delete_pipeline_ecr(ecr_client, pipe_client, pipeline_name)
 
     return util.status_output(200, "POST successfully processed")
