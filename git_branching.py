@@ -84,7 +84,12 @@ def lambda_handler(event, _):
                     stage['actions'][0]['configuration']['Branch'] = ref
                     stage['actions'][0]['configuration']['OAuthToken'] = util.decrypt_env_variable('oauth',
                                                                                                    region=region)
-            for stage in template_json['pipeline']['stages']:
+                if stage['name'] == 'Build':
+                    env_location = ["[{\"name\":\"LOCATION_NAME\",\"value\":\"",
+                                    pipeline_name,
+                                    "\",\"type\":\"PLAINTEXT\"}]"]
+                    stage['actions'][0]['configuration']["EnvironmentVariables"] = ''.join(env_location)
+
                 for action in stage['actions']:
                     action['region'] = region
 
