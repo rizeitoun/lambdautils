@@ -80,6 +80,7 @@ def lambda_handler(event, _):
             template_json['pipeline']['name'] = pipeline_name
             for stage in template_json['pipeline']['stages']:
                 if stage['name'] == 'Source':
+                    stage['actions'][0]['configuration']['Repo'] = project_name
                     stage['actions'][0]['configuration']['Branch'] = ref
                     stage['actions'][0]['configuration']['OAuthToken'] = util.decrypt_env_variable('oauth',
                                                                                                    region=region)
