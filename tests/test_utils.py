@@ -5,6 +5,7 @@ import os
 
 example_file = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'data', 'post_case_git_delete.json')
 
+
 class EncodingDecoding(unittest.TestCase):
 
     def test_dictionary_encode(self):
