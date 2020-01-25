@@ -46,6 +46,8 @@ def lambda_handler(event, _):
         return util.status_output(403, "Unable to find signature.")
 
     body = event['body']
+    if isinstance(body, str):
+        body = json.loads(body)
 
     return_data = validate_hash(body, access)
     if return_data is not None:

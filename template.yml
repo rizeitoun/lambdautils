@@ -9,19 +9,7 @@ Parameters:
       - git_branching.lambda_handler
       - git_statuses.lambda_handler
     Description: Lambda Function to run.
-  StageName:
-    Type: String
-    Description: The name of the stage, e.g. "dev", "preprod", "prod"
-    Default: dev
 Resources:
-  ApiGatewayApi:
-    Type: AWS::Serverless::Api
-    Properties:
-      Name:
-        Fn::Sub: todo-app-api-${StageName}
-      StageName:
-        Ref: StageName
-      EndpointConfiguration: REGIONAL
   BranchFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -32,12 +20,10 @@ Resources:
       Role: >-
         arn:aws:iam::359042822489:role/service-role/gitBranchChange-role-feip54yw
       Events:
-        ApiEvent:
+        Api1:
           Type: Api
           Properties:
-            Path: /v1/git
-            RestApiId:
-              Ref: ApiGatewayApi
+            Path: /git
             Method: ANY
       Environment:
         Variables:
