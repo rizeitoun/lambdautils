@@ -3,18 +3,29 @@ version: 0.2
 phases:
   install:
     runtime-versions:
-      python: 3.7
+      docker: 18
   pre_build:
     commands:
-      - echo No prebuild
+      - echo Logging in to Amazon ECR...
+      - aws --version
+      - $(aws ecr get-login --region $AWS_DEFAULT_REGION --no-include-email)
+      - REPOSITORY_URI=$REPO_BASE"/"$CONTAINER_NAME
+      - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
+      - IMAGE_TAG=${COMMIT_HASH:=latest}
+      - echo "Container saved to "$REPOSITORY_URI":"$IMAGE_TAG
   build:
     commands:
       - echo Build started on `date`
-      - pip install requests -t ./
-      - export BUCKET=codepipeline-us-east-1-510222075463
-      - aws cloudformation package --template-file template.yml --s3-bucket $BUCKET --output-template-file outputtemplate.yml
+      - echo Building the Docker image...
+      - docker build -t $REPOSITORY_URI:latest .
+      - docker tag $REPOSITORY_URI:latest $REPOSITORY_URI:$IMAGE_TAG
+  post_build:
+    commands:
+      - echo Build completed on `date`
+      - echo Pushing the Docker images...
+      - docker push $REPOSITORY_URI:$IMAGE_TAG
+      - docker push $REPOSITORY_URI:latest
+      - printf '[{"name":"%s","imageUri":"%s"}]' $NAME $REPOSITORY_URI:$IMAGE_TAG > $FILENAME
+
 artifacts:
-  type: zip
-  files:
-    - template.yml
-    - outputtemplate.yml
+  files: $FILENAME
