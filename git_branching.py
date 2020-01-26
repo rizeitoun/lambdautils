@@ -12,7 +12,7 @@ s3_bucket = config['git_branching']['s3_bucket']
 enc = config['git_branching']['enc']
 region = config['git_branching']['region']
 pipeline_template = config['git_branching']['pipeline_template']
-webhook_template = config['git_branching']['pipeline_template']
+webhook_template = config['git_branching']['webhook_template']
 policy_template = config['git_branching']['policy_template']
 
 
