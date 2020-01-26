@@ -14,7 +14,6 @@ pipeline_template = config['git_branching']['pipeline_template']
 policy_template = config['git_branching']['policy_template']
 
 
-
 def validate_hash(body, access):
     encoded_body = util.dictionary_encode(body)
     secret = util.decrypt_env_variable('secret', region)
