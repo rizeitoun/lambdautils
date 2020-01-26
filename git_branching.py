@@ -44,6 +44,7 @@ def delete_pipeline_ecr(ecr_client: boto3.client, pipe_client: boto3.client, pip
 def setup_hook(s3_client: boto3.client, pipe_client: boto3.client, webhook_template: str, pipeline_name: str, webhook_name: str):
     hook_file = s3_client.get_object(Bucket=s3_bucket, Key=webhook_template)
     hook_json = json.loads(hook_file['Body'].read().decode("utf-8"))['webhook']
+
     secret = util.decrypt_env_variable('oauth', region=region)
     hook_json['name'] = webhook_name
     hook_json['targetPipeline'] = pipeline_name
