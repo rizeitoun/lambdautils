@@ -9,7 +9,9 @@ config_defaults = {
             'enc': 'ascii',
             'region': 'us-east-1',
             'pipeline_template': 'pipeline_templates/ci_pipeline.json',
-            'policy_template': 'policy_templates/ecr_repo_policy.json'
+            'policy_template': 'policy_templates/ecr_repo_policy.json',
+            'webhook_template': 'pipeline_templates/github_webhook.json',
+            's3_bucket': 'template-storage-01162020',
         },
 }
 

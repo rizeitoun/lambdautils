@@ -8,9 +8,11 @@ Will create or destroy codepipelines and container registries when a new branch 
 created or destroyed, respectively.
 """
 
+s3_bucket = config['git_branching']['s3_bucket']
 enc = config['git_branching']['enc']
 region = config['git_branching']['region']
 pipeline_template = config['git_branching']['pipeline_template']
+webhook_template = config['git_branching']['pipeline_template']
 policy_template = config['git_branching']['policy_template']
 
 
@@ -28,15 +30,35 @@ def validate_hash(body, access):
     return return_data
 
 
-def delete_pipeline_ecr(ecr_client: boto3.client, pipe_client: boto3.client, name: str):
+def delete_pipeline_ecr(ecr_client: boto3.client, pipe_client: boto3.client, pipeline_name: str, webhook_name: str):
     try:
-        pipe_client.deregister_webhook_with_third_party(webhookName=f"{name}_webhook")
-        pipe_client.delete_webhook(name=f"{name}_webhook")
-        pipe_client.delete_pipeline(name=name)
-        ecr_client.delete_repository(repositoryName=name, force=True)
+        pipe_client.deregister_webhook_with_third_party(webhookName=webhook_name)
+        pipe_client.delete_webhook(name=webhook_name)
+        pipe_client.delete_pipeline(name=pipeline_name)
+        ecr_client.delete_repository(repositoryName=pipeline_name, force=True)
     except (ecr_client.exceptions.RepositoryNotFoundException,
             pipe_client.exceptions.PipelineNotFoundException):
         pass
+
+
+def setup_hook(s3_client: boto3.client, pipe_client: boto3.client, webhook_template: str, pipeline_name: str, webhook_name: str):
+    hook_file = s3_client.get_object(Bucket=s3_bucket, Key=webhook_template)
+    hook_json = json.loads(hook_file['Body'].read().decode("utf-8"))['webhook']
+    secret = util.decrypt_env_variable('oauth', region=region)
+    hook_json['name'] = webhook_name
+    hook_json['targetPipeline'] = pipeline_name
+    hook_json['targetAction'] = 'Source'
+    hook_json['authenticationConfiguration'] = {'SecretToken': secret}
+
+    make_hook = True
+    for _hook in pipe_client.list_webhooks()['webhooks']:
+        if _hook['definition']['targetPipeline'] == pipeline_name:
+            make_hook = False
+
+    if make_hook:
+        pipe_client.put_webhook(webhook=hook_file)
+        pipe_client.register_webhook_with_third_party(webhookName=webhook_name)
+
 
 def lambda_handler(event, _):
 
@@ -69,6 +91,7 @@ def lambda_handler(event, _):
         ref = body['ref']
         project_name = body['repository']['name']
         pipeline_name = f"{project_name}_{ref.replace('/', '')}"
+        webhook_name = f"{pipeline_name}_webhook"
 
         event_type = headers['X-GitHub-Event']
         if event_type == 'create':
@@ -108,6 +131,6 @@ def lambda_handler(event, _):
                 pass
 
         elif event_type == 'delete':
-            delete_pipeline_ecr(ecr_client, pipe_client, pipeline_name)
+            delete_pipeline_ecr(ecr_client, pipe_client, pipeline_name, webhook_name)
 
     return util.status_output(200, "POST successfully processed")
