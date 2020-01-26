@@ -30,6 +30,8 @@ def validate_hash(body, access):
 
 def delete_pipeline_ecr(ecr_client: boto3.client, pipe_client: boto3.client, name: str):
     try:
+        pipe_client.deregister_webhook_with_third_party(webhookName=f"{name}_webhook")
+        pipe_client.delete_webhook(name=f"{name}_webhook")
         pipe_client.delete_pipeline(name=name)
         ecr_client.delete_repository(repositoryName=name, force=True)
     except (ecr_client.exceptions.RepositoryNotFoundException,
@@ -100,6 +102,7 @@ def lambda_handler(event, _):
                 ecr_client.create_repository(repositoryName=pipeline_name, tags=ecr_tags)
                 ecr_client.put_lifecycle_policy(repositoryName=pipeline_name, lifecyclePolicyText=policy_json)
                 pipe_client.create_pipeline(pipeline=template_json['pipeline'], tags=pipeline_tags)
+
             except (ecr_client.exceptions.RepositoryAlreadyExistsException,
                     pipe_client.exceptions.PipelineNameInUseException):
                 pass
