@@ -125,6 +125,7 @@ def lambda_handler(event, _):
                 ecr_client.create_repository(repositoryName=pipeline_name, tags=ecr_tags)
                 ecr_client.put_lifecycle_policy(repositoryName=pipeline_name, lifecyclePolicyText=policy_json)
                 pipe_client.create_pipeline(pipeline=template_json['pipeline'], tags=pipeline_tags)
+                setup_hook(s3, pipe_client, webhook_template, pipeline_name, webhook_name)
 
             except (ecr_client.exceptions.RepositoryAlreadyExistsException,
                     pipe_client.exceptions.PipelineNameInUseException):
