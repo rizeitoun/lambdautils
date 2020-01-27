@@ -8,6 +8,8 @@ Will create or destroy codepipelines, webhook and container registries when a ne
 created or destroyed, respectively.
 """
 
+# Config from config.cfg, can be changed to environmental variables.
+
 s3_bucket = config['git_branching']['s3_bucket']
 enc = config['git_branching']['enc']
 region = config['git_branching']['region']
