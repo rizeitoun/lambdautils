@@ -57,7 +57,7 @@ def setup_hook(s3_client: boto3.client, pipe_client: boto3.client, webhook_templ
             make_hook = False
 
     if make_hook:
-        pipe_client.put_webhook(webhook=hook_file)
+        pipe_client.put_webhook(webhook=hook_json)
         pipe_client.register_webhook_with_third_party(webhookName=webhook_name)
 
 
