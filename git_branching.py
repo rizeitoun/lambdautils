@@ -4,9 +4,11 @@ import json
 from config import config
 
 """ 
-Will create or destroy codepipelines and container registries when a new branch is 
+Will create or destroy codepipelines, webhook and container registries when a new branch is 
 created or destroyed, respectively.
 """
+
+# Config from config.cfg, can be changed to environmental variables.
 
 s3_bucket = config['git_branching']['s3_bucket']
 enc = config['git_branching']['enc']
@@ -16,10 +18,11 @@ webhook_template = config['git_branching']['webhook_template']
 policy_template = config['git_branching']['policy_template']
 
 
-def validate_hash(body, access):
+def validate_hash(body, access: str, access_prefix: str = 'sha1='):
+    """ Validates hash versus encrpyted environmental variable secret. """
     encoded_body = util.dictionary_encode(body)
     secret = util.decrypt_env_variable('secret', region)
-    expected = access.replace('sha1=', '')
+    expected = access.replace(access_prefix, '')
 
     validate = util.validate_hash(encoded_body, secret, expected)
 
@@ -31,6 +34,8 @@ def validate_hash(body, access):
 
 
 def delete_pipeline_ecr(ecr_client: boto3.client, pipe_client: boto3.client, pipeline_name: str, webhook_name: str):
+    """ Deletes branch from AWS tracking in 3-step process, by first deregistering and deleting webhook,
+    second deleting pipeine and finally deleting ecr repository. """
     try:
         pipe_client.deregister_webhook_with_third_party(webhookName=webhook_name)
         pipe_client.delete_webhook(name=webhook_name)
@@ -42,6 +47,7 @@ def delete_pipeline_ecr(ecr_client: boto3.client, pipe_client: boto3.client, pip
 
 
 def setup_hook(s3_client: boto3.client, pipe_client: boto3.client, webhook_template: str, pipeline_name: str, webhook_name: str):
+    """ Setup webhook using a hook json template loaded from s3 location."""
     hook_file = s3_client.get_object(Bucket=s3_bucket, Key=webhook_template)
     hook_json = json.loads(hook_file['Body'].read().decode("utf-8"))['webhook']
 
